@@ -83,31 +83,23 @@ Object.defineProperties(ParsedText.prototype, {
   }
 });
 
-function parseTextSync(filePath, syllableLookup) {
-  var data = fs.readFileSync(filePath, 'utf8').replace(/K\./g, 'Josef');
+function parseTextSync(filesPathArr, syllableLookup) {
+  var data = '';
+  for (var i = 0; i < filesPathArr.length; i++) {
+    data += fs.readFileSync(filesPathArr[i], 'utf8');
+  }
   var rawSentences = data.split('.').map(para => para.replace(/\s/, '').replace(/\n/g, ' ').replace(/[^a-z\s]+/gi, '').replace(/\s{2,}/g, ' ').split(' '));
-  var rawSyllables = rawSentences.map(sentence => sentence.map(word => syllableLookup[word.toLowerCase()] || 0).join(','));
+  var rawSyllables = rawSentences.map(sentence => sentence.map(word => syllableLookup.dict[word.toLowerCase()] || 0).join(','));
   return new ParsedText(rawSentences, rawSyllables);
 }
 
 function createHaiku(pattern, cmuDictPath, textPathsArr) {
   var haiku = '',
     syllableLookup = syllableLookupGenSync(cmuDictPath),
-    numOfTextsToParse = Math.min(pattern.length, textPathsArr.length),
-    parsedTexts = [];
-  var randomIndices = arrayGen(0, textPathsArr.length - 1).shuffle().slice(0, numOfTextsToParse);
-  randomIndices.forEach(e => {
-    parsedTexts.push(parseTextSync(textPathsArr[e], syllableLookup.dict));
-  });
-  return pattern.map((line, i) => {
-    var haikuLine = parsedTexts.next(i).findRandomMatch(line);
+    parsedText = parseTextSync(textPathsArr, syllableLookup);
+  return pattern.map(line => {
+    var haikuLine = parsedText.findRandomMatch(line);
     if (haikuLine) return haikuLine;
-    var j = 1;
-    while(haikuLine === undefined && j <= Math.abs(numOfTextsToParse - textPathsArr.length)) {
-    	haikuLine = parsedTexts.next(i + j).findRandomMatch(line);
-    	j++;
-    }
-    console.log(i, 'in dict');
     return syllableLookup.findRandomMatch(line);
   }).join('\n');
 }
