@@ -83,23 +83,22 @@ Object.defineProperties(ParsedText.prototype, {
   }
 });
 
-function parseTextSync(filesPathArr, syllableLookup) {
-  var data = '';
-  for (var i = 0; i < filesPathArr.length; i++) {
-    data += fs.readFileSync(filesPathArr[i], 'utf8');
-  }
+function parseTextSync(filesPathArr, syllableLookup, data) {
+	for (var i = 0; i < filesPathArr.length; i++) {
+	  data += fs.readFileSync(filesPathArr[i], 'utf8');
+	}
   var rawSentences = data.split('.').map(para => para.replace(/\s/, '').replace(/\n/g, ' ').replace(/[^a-z\s]+/gi, '').replace(/\s{2,}/g, ' ').split(' '));
   var rawSyllables = rawSentences.map(sentence => sentence.map(word => syllableLookup.dict[word.toLowerCase()] || 0).join(','));
   return new ParsedText(rawSentences, rawSyllables);
 }
 
-function createHaiku(pattern, cmuDictPath, textPathsArr) {
+function createHaiku(pattern, cmuDictPath, textPathsArr, data) {
   var haiku = '',
     syllableLookup = syllableLookupGenSync(cmuDictPath),
-    parsedText = parseTextSync(textPathsArr, syllableLookup);
+    parsedText = parseTextSync(textPathsArr, syllableLookup, data);
   return pattern.map(line => {
     var haikuLine = parsedText.findRandomMatch(line);
-    if (haikuLine) return haikuLine;
+    if (haikuLine) return haikuLine.toLowerCase();
     return syllableLookup.findRandomMatch(line);
   }).join('\n');
 }

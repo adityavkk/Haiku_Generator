@@ -1,0 +1,24 @@
+{
+  "name": "haiku-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "haiku.js",
+  "dependencies": {
+    "request": "^2.73.0",
+    "sync-request": "^3.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityavkk/Haiku_Generator.git"
+  },
+  "author": "Aditya Kumarakrishnan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adityavkk/Haiku_Generator/issues"
+  },
+  "homepage": "https://github.com/adityavkk/Haiku_Generator#readme"
+}
